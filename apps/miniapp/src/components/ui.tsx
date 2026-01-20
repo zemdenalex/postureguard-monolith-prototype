@@ -1,5 +1,6 @@
 import React from 'react';
 import type { PostureStatus } from '../types';
+import { haptics } from '../utils/haptics';
 
 // Posture Indicator
 interface PostureIndicatorProps {
@@ -127,6 +128,7 @@ interface ButtonProps {
   onClick?: () => void;
   className?: string;
   type?: 'button' | 'submit';
+  haptic?: boolean;
 }
 
 export function Button({
@@ -139,6 +141,7 @@ export function Button({
   onClick,
   className = '',
   type = 'button',
+  haptic = true,
 }: ButtonProps) {
   const variantClasses = {
     primary: 'btn-primary',
@@ -153,10 +156,17 @@ export function Button({
     lg: 'py-4 px-8 text-lg',
   };
 
+  const handleClick = () => {
+    if (haptic && !disabled && !loading) {
+      haptics.light();
+    }
+    onClick?.();
+  };
+
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled || loading}
       className={`
         ${variantClasses[variant]}

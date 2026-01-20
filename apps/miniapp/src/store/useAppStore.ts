@@ -13,6 +13,7 @@ import type {
   ExerciseSession,
 } from '../types';
 import { mockAchievements, mockExercises } from '../utils/mockData';
+import { haptics } from '../utils/haptics';
 
 // Default settings
 const defaultSettings: UserSettings = {
@@ -181,10 +182,17 @@ export const useAppStore = create<AppState>()(
         let xpToNext = user.xpToNextLevel;
 
         // Check for level up
+        const startLevel = user.level;
         while (newXp >= xpToNext) {
           newXp -= xpToNext;
           newLevel++;
           xpToNext = calculateXpForLevel(newLevel);
+        }
+
+        // Haptic feedback on level up
+        if (newLevel > startLevel && get().user?.settings.hapticEnabled) {
+          haptics.success();
+          haptics.medium();
         }
 
         set({
@@ -202,13 +210,25 @@ export const useAppStore = create<AppState>()(
 
       // Posture actions
       setPosture: (status) => {
+        const prevStatus = get().currentPosture;
         set({ currentPosture: status });
+
+        // Haptic feedback on status change
+        if (status !== prevStatus && get().user?.settings.hapticEnabled) {
+          if (status === 'good') haptics.success();
+          else if (status === 'attention') haptics.warning();
+          else if (status === 'poor') haptics.error();
+        }
+
         if (get().isTracking) {
           get().updateSession();
         }
       },
 
       startSession: () => {
+        if (get().user?.settings.hapticEnabled) {
+          haptics.medium();
+        }
         const session: PostureSession = {
           id: crypto.randomUUID(),
           startTime: new Date(),
@@ -303,6 +323,10 @@ export const useAppStore = create<AppState>()(
 
         // Check achievements
         get().checkAchievements();
+
+        if (get().user?.settings.hapticEnabled) {
+          haptics.success();
+        }
       },
 
       updateSession: () => {
@@ -412,6 +436,11 @@ export const useAppStore = create<AppState>()(
         );
 
         set({ achievements: updatedAchievements });
+
+        if (get().user?.settings.hapticEnabled) {
+          haptics.success();
+        }
+
         get().addXp(achievement.xpReward);
       },
 
