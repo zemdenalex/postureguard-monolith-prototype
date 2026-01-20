@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { translations, type Language } from '../i18n/translations';
 import type { TelegramWebApp } from '../types';
+import { useToast } from '../contexts/ToastContext';
+import { haptics } from '../utils/haptics';
 
 // Translation hook
 export function useTranslation() {
@@ -187,16 +189,69 @@ export function usePostureSimulation() {
 // Session timer hook
 export function useSessionTimer() {
   const { isTracking, currentSession, updateSession } = useAppStore();
-  
+
   useEffect(() => {
     if (!isTracking || !currentSession) return;
-    
+
     const interval = setInterval(() => {
       updateSession();
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [isTracking, currentSession, updateSession]);
+}
+
+// Random posture events during active session
+export function useRandomPostureEvents() {
+  const { isTracking, currentPosture, addXp, user } = useAppStore();
+  const { showToast } = useToast();
+  const { t } = useTranslation();
+  const debugMode = user?.settings.debugMode || false;
+  const hapticEnabled = user?.settings.hapticEnabled !== false;
+
+  useEffect(() => {
+    if (!isTracking || debugMode) return;
+
+    // Random interval between 10-30 seconds
+    const getRandomInterval = () => Math.floor(Math.random() * 20000) + 10000;
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const scheduleNextEvent = () => {
+      timeoutId = setTimeout(() => {
+        // Trigger event based on current posture
+        if (currentPosture === 'good') {
+          showToast({
+            type: 'success',
+            message: t('events.goodPosture'),
+            duration: 3000,
+          });
+          if (hapticEnabled) haptics.success();
+          addXp(5); // Bonus XP
+        } else if (currentPosture === 'attention') {
+          showToast({
+            type: 'warning',
+            message: t('events.attentionPosture'),
+            duration: 3000,
+          });
+          if (hapticEnabled) haptics.warning();
+        } else if (currentPosture === 'poor') {
+          showToast({
+            type: 'error',
+            message: t('events.poorPosture'),
+            duration: 3000,
+          });
+          if (hapticEnabled) haptics.error();
+        }
+
+        scheduleNextEvent();
+      }, getRandomInterval());
+    };
+
+    scheduleNextEvent();
+
+    return () => clearTimeout(timeoutId);
+  }, [isTracking, debugMode, currentPosture, addXp, showToast, t, hapticEnabled]);
 }
 
 // Format time helper

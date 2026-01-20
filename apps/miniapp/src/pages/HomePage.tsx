@@ -4,13 +4,14 @@ import {
   Lightbulb, ChevronRight 
 } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
-import { 
-  useTranslation, 
-  useGreeting, 
-  useDailyTip, 
-  usePostureSimulation, 
+import {
+  useTranslation,
+  useGreeting,
+  useDailyTip,
+  usePostureSimulation,
   useSessionTimer,
-  formatTime 
+  useRandomPostureEvents,
+  formatTime
 } from '../hooks';
 import { Card, Button, ProgressRing, PostureIndicator, Badge } from '../components/ui';
 
@@ -34,6 +35,7 @@ export function HomePage() {
   // Enable posture simulation and session timer
   usePostureSimulation();
   useSessionTimer();
+  useRandomPostureEvents();
 
   const today = new Date().toISOString().split('T')[0];
   const todayStats = dailyStats[today];

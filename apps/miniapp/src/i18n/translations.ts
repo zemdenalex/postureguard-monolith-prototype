@@ -442,8 +442,15 @@ export const translations = {
       newAchievement: 'Новое достижение: {{title}} 🏆',
       levelUp: 'Новый уровень! Теперь ты {{level}} уровня 🌟',
     },
+
+    // Random posture events
+    events: {
+      goodPosture: 'Отличная осанка! +5 XP',
+      attentionPosture: 'Выпрямите спину!',
+      poorPosture: 'Внимание: сутулость!',
+    },
   },
-  
+
   en: {
     // Common
     common: {
@@ -884,6 +891,13 @@ export const translations = {
       streakMaintained: 'Streak maintained! {{days}} days in a row 🔥',
       newAchievement: 'New achievement: {{title}} 🏆',
       levelUp: 'Level up! You are now level {{level}} 🌟',
+    },
+
+    // Random posture events
+    events: {
+      goodPosture: 'Great posture! +5 XP',
+      attentionPosture: 'Straighten your back!',
+      poorPosture: 'Warning: slouching!',
     },
   },
 } as const;

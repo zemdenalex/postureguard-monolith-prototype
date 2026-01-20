@@ -87,8 +87,11 @@ sudo systemctl restart postureguard-bot
 src/
 ├── components/
 │   ├── ui.tsx            # UI компоненты (Card, Button, Toggle, Badge, Modal, ProgressRing)
+│   ├── Toast.tsx         # Toast уведомления с анимацией
 │   ├── Layout.tsx        # Лейаут с нижней навигацией
 │   └── Onboarding.tsx    # 5-шаговый онбординг
+├── contexts/
+│   └── ToastContext.tsx  # Контекст для toast уведомлений (useToast, showToast)
 ├── pages/
 │   ├── HomePage.tsx      # Главная: трекинг, сессии, XP
 │   ├── ProgressPage.tsx  # Статистика по дням/неделям
@@ -98,13 +101,14 @@ src/
 ├── store/
 │   └── useAppStore.ts    # Zustand store (ВСЁ состояние здесь)
 ├── hooks/
-│   └── index.ts          # useTranslation, useTelegram, useTheme, usePostureSimulation
+│   └── index.ts          # useTranslation, useTelegram, useTheme, usePostureSimulation, useRandomPostureEvents
 ├── i18n/
 │   └── translations.ts   # Переводы RU/EN
 ├── types/
 │   └── index.ts          # TypeScript типы
 └── utils/
-    └── mockData.ts       # Моковые данные (12 ачивок, 8 упражнений)
+    ├── mockData.ts       # Моковые данные (12 ачивок, 8 упражнений)
+    └── haptics.ts        # Утилита для haptic feedback (success, warning, error)
 ```
 
 ### Bot (`apps/bot/`)
@@ -221,6 +225,35 @@ t('home.posture.good')  // "Отличная осанка" или "Good posture"
 // Добавление новых переводов в src/i18n/translations.ts
 ```
 
+### Toast уведомления
+
+```tsx
+import { useToast } from '../contexts/ToastContext';
+
+const { showToast } = useToast();
+
+// Показать toast
+showToast({
+  type: 'success',  // 'success' | 'warning' | 'error' | 'info'
+  message: 'Сообщение',
+  duration: 3000,   // опционально, по умолчанию 3000ms
+});
+```
+
+### Haptic Feedback
+
+```tsx
+import { haptics } from '../utils/haptics';
+
+// Вибрация при событиях
+haptics.success();   // Успешное действие
+haptics.warning();   // Предупреждение
+haptics.error();     // Ошибка
+haptics.light();     // Легкая вибрация
+haptics.medium();    // Средняя вибрация
+haptics.heavy();     // Сильная вибрация
+```
+
 ---
 
 ## Constraints & Rules
@@ -265,9 +298,12 @@ t('home.posture.good')  // "Отличная осанка" или "Good posture"
 | `src/store/useAppStore.ts` | ВСЁ состояние и логика |
 | `src/pages/HomePage.tsx` | Главный экран с трекингом |
 | `src/components/ui.tsx` | Все UI компоненты |
-| `src/hooks/index.ts` | Хуки (usePostureSimulation важен!) |
+| `src/components/Toast.tsx` | Toast уведомления |
+| `src/contexts/ToastContext.tsx` | Контекст для toast (useToast) |
+| `src/hooks/index.ts` | Хуки (usePostureSimulation, useRandomPostureEvents) |
 | `src/i18n/translations.ts` | Переводы |
 | `src/utils/mockData.ts` | Моковые упражнения и достижения |
+| `src/utils/haptics.ts` | Haptic feedback утилита |
 
 ---
 
@@ -323,9 +359,15 @@ tg?.HapticFeedback?.notificationOccurred('success');
 
 ### Добавить случайное событие
 
-1. Создать хук в `src/hooks/index.ts`
-2. Использовать `useEffect` с `setInterval`
-3. Вызывать экшены из store при событии
+Уже реализовано в `useRandomPostureEvents`:
+- Показывает toast каждые 10-30 секунд во время сессии
+- Haptic feedback через `src/utils/haptics.ts`
+- Toast через `useToast()` из `src/contexts/ToastContext.tsx`
+
+Для нового типа события:
+1. Добавить логику в `useRandomPostureEvents` в `src/hooks/index.ts`
+2. Добавить переводы в `src/i18n/translations.ts` (секция `events`)
+3. Использовать `showToast()` и `haptics.success/warning/error()`
 
 ---
 
