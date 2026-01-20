@@ -79,7 +79,8 @@ interface AppState {
   
   // Achievements
   achievements: Achievement[];
-  
+  lastUnlockedAchievement: Achievement | null;
+
   // Exercises
   exercises: Exercise[];
   exerciseHistory: ExerciseSession[];
@@ -108,6 +109,7 @@ interface AppState {
   // Actions - Achievements
   unlockAchievement: (id: string) => void;
   checkAchievements: () => void;
+  clearLastUnlocked: () => void;
   
   // Actions - Exercises
   completeExercise: (exerciseId: string) => void;
@@ -137,6 +139,7 @@ export const useAppStore = create<AppState>()(
       device: defaultDevice,
       dailyStats: {},
       achievements: mockAchievements,
+      lastUnlockedAchievement: null,
       exercises: mockExercises,
       exerciseHistory: [],
       activeTab: 'home',
@@ -429,19 +432,26 @@ export const useAppStore = create<AppState>()(
         const achievement = achievements.find((a) => a.id === id);
         if (!achievement || achievement.unlocked) return;
 
+        const unlockedAchievement = { ...achievement, unlocked: true, unlockedAt: new Date(), progress: achievement.maxProgress };
+
         const updatedAchievements = achievements.map((a) =>
-          a.id === id
-            ? { ...a, unlocked: true, unlockedAt: new Date(), progress: a.maxProgress }
-            : a
+          a.id === id ? unlockedAchievement : a
         );
 
-        set({ achievements: updatedAchievements });
+        set({
+          achievements: updatedAchievements,
+          lastUnlockedAchievement: unlockedAchievement,
+        });
 
         if (get().user?.settings.hapticEnabled) {
           haptics.success();
         }
 
         get().addXp(achievement.xpReward);
+      },
+
+      clearLastUnlocked: () => {
+        set({ lastUnlockedAchievement: null });
       },
 
       checkAchievements: () => {

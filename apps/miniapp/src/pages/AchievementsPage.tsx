@@ -152,11 +152,11 @@ export function AchievementsPage() {
 
               {/* Title */}
               <h3 className={`font-semibold text-sm mb-1 ${
-                unlocked 
-                  ? 'text-slate-800 dark:text-white' 
+                unlocked
+                  ? 'text-slate-800 dark:text-white'
                   : 'text-slate-500 dark:text-slate-400'
               }`}>
-                {t(`achievements.list.${achievement.id}.name`)}
+                {t(achievement.titleKey)}
               </h3>
 
               {/* Progress or XP */}
@@ -182,7 +182,7 @@ export function AchievementsPage() {
               {showUnlocked === achievement.id && (
                 <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 animate-fade-in">
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {t(`achievements.list.${achievement.id}.description`)}
+                    {t(achievement.descriptionKey)}
                   </p>
                 </div>
               )}
@@ -212,7 +212,7 @@ export function AchievementsPage() {
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="font-medium text-slate-800 dark:text-white text-sm">
-                        {t(`achievements.list.${achievement.id}.name`)}
+                        {t(achievement.titleKey)}
                       </h4>
                       <span className="text-xs text-amber-600 dark:text-amber-400">
                         +{achievement.xpReward} XP

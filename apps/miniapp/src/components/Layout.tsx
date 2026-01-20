@@ -3,13 +3,14 @@ import { Home, TrendingUp, Dumbbell, Trophy, Settings } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { useTranslation } from '../hooks';
 import { TabItem } from './ui';
+import { AchievementUnlockedModal } from './AchievementUnlockedModal';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
-  const { activeTab, setActiveTab, user } = useAppStore();
+  const { activeTab, setActiveTab, user, lastUnlockedAchievement, clearLastUnlocked } = useAppStore();
   const { t } = useTranslation();
   const debugMode = user?.settings.debugMode || false;
 
@@ -49,6 +50,12 @@ export function Layout({ children }: LayoutProps) {
           ))}
         </div>
       </nav>
+
+      {/* Achievement Unlock Modal */}
+      <AchievementUnlockedModal
+        achievement={lastUnlockedAchievement}
+        onClose={clearLastUnlocked}
+      />
     </div>
   );
 }

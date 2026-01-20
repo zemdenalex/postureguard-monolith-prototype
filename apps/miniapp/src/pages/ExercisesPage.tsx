@@ -39,9 +39,9 @@ export function ExercisesPage() {
   // Get exercise with translated content
   const getExercise = (exercise: Exercise) => ({
     ...exercise,
-    name: t(`exercises.list.${exercise.id}.name`),
-    description: t(`exercises.list.${exercise.id}.description`),
-    steps: exercise.steps.map((_: unknown, i: number) => t(`exercises.list.${exercise.id}.steps.${i}`)),
+    name: t(exercise.titleKey),
+    description: t(exercise.descriptionKey),
+    steps: exercise.steps.map((step) => step.instructionKey),
   });
 
   // Timer logic
@@ -338,7 +338,7 @@ export function ExercisesPage() {
               {t('exercises.todayProgress')}
             </p>
             <p className="text-sm text-amber-700 dark:text-amber-300">
-              {user?.stats.completedExercises?.length || 0} {t('exercises.completed')} • 
+              {user?.stats.completedExercises?.length || 0} {t('exercises.exercisesDone')} • 
               +{(user?.stats.completedExercises?.length || 0) * 25} XP
             </p>
           </div>
