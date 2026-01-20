@@ -71,6 +71,13 @@ fi
 # SSH connection string
 SSH_TARGET="${SERVER_USER}@${SERVER_IP}"
 
+# Sudo prefix (empty if root)
+if [ "$SERVER_USER" = "root" ]; then
+    SUDO=""
+else
+    SUDO="sudo"
+fi
+
 # Deploy web (miniapp)
 deploy_web() {
     print_header "Deploying Mini App"
@@ -82,16 +89,20 @@ deploy_web() {
     cd "$SCRIPT_DIR"
     print_success "Build completed"
 
-    # Deploy
+    # Clean remote directory and create fresh
+    print_info "Preparing remote directory..."
+    ssh "$SSH_TARGET" "${SUDO} rm -rf ${REMOTE_WEB_PATH}/* 2>/dev/null || true"
+    ssh "$SSH_TARGET" "${SUDO} mkdir -p ${REMOTE_WEB_PATH}"
+    print_success "Remote directory ready"
+
+    # Upload using scp (works on Windows)
     print_info "Uploading to server..."
-    rsync -avz --delete \
-        apps/miniapp/dist/ \
-        "${SSH_TARGET}:${REMOTE_WEB_PATH}/"
+    scp -r apps/miniapp/dist/* "${SSH_TARGET}:${REMOTE_WEB_PATH}/"
     print_success "Mini App deployed to ${REMOTE_WEB_PATH}"
 
     # Set permissions
     print_info "Setting permissions..."
-    ssh "$SSH_TARGET" "chmod -R 755 ${REMOTE_WEB_PATH}"
+    ssh "$SSH_TARGET" "${SUDO} chmod -R 755 ${REMOTE_WEB_PATH}"
     print_success "Permissions set"
 }
 
@@ -99,25 +110,28 @@ deploy_web() {
 deploy_bot() {
     print_header "Deploying Bot"
 
-    # Upload bot files
+    # Prepare remote directory
+    print_info "Preparing bot directory..."
+    ssh "$SSH_TARGET" "mkdir -p ${REMOTE_BOT_PATH}"
+
+    # Upload bot files (excluding venv, pycache)
     print_info "Uploading bot files..."
-    rsync -avz \
-        --exclude '__pycache__' \
-        --exclude '*.pyc' \
-        --exclude 'venv' \
-        --exclude '.venv' \
-        apps/bot/ \
-        "${SSH_TARGET}:${REMOTE_BOT_PATH}/"
+    scp apps/bot/bot.py "${SSH_TARGET}:${REMOTE_BOT_PATH}/"
+    scp apps/bot/requirements.txt "${SSH_TARGET}:${REMOTE_BOT_PATH}/"
+    # Copy service file if exists
+    if [ -f "apps/bot/postureguard-bot.service" ]; then
+        scp apps/bot/postureguard-bot.service "${SSH_TARGET}:${REMOTE_BOT_PATH}/"
+    fi
     print_success "Bot files uploaded to ${REMOTE_BOT_PATH}"
 
     # Restart service
     print_info "Restarting bot service..."
-    ssh "$SSH_TARGET" "sudo systemctl restart postureguard-bot"
+    ssh "$SSH_TARGET" "${SUDO} systemctl restart postureguard-bot"
     print_success "Bot service restarted"
 
     # Check status
     print_info "Checking bot status..."
-    ssh "$SSH_TARGET" "sudo systemctl status postureguard-bot --no-pager -l" || true
+    ssh "$SSH_TARGET" "${SUDO} systemctl status postureguard-bot --no-pager -l" || true
 }
 
 # Show usage

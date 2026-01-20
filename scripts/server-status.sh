@@ -54,6 +54,13 @@ fi
 
 SSH_TARGET="${SERVER_USER}@${SERVER_IP}"
 
+# Sudo prefix (empty if root)
+if [ "$SERVER_USER" = "root" ]; then
+    SUDO=""
+else
+    SUDO="sudo"
+fi
+
 print_header "PostureGuard Server Status"
 echo -e "Server: ${GREEN}${SSH_TARGET}${NC}"
 
@@ -68,11 +75,11 @@ print_success "Connected"
 
 # Nginx status
 print_section "Nginx Status"
-ssh "$SSH_TARGET" "sudo systemctl status nginx --no-pager -l 2>/dev/null | head -15" || echo -e "${RED}Nginx not running or not installed${NC}"
+ssh "$SSH_TARGET" "${SUDO} systemctl status nginx --no-pager -l 2>/dev/null | head -15" || echo -e "${RED}Nginx not running or not installed${NC}"
 
 # Bot status
 print_section "Bot Service Status"
-ssh "$SSH_TARGET" "sudo systemctl status postureguard-bot --no-pager -l 2>/dev/null | head -20" || echo -e "${YELLOW}Bot service not found or not running${NC}"
+ssh "$SSH_TARGET" "${SUDO} systemctl status postureguard-bot --no-pager -l 2>/dev/null | head -20" || echo -e "${YELLOW}Bot service not found or not running${NC}"
 
 # Disk space
 print_section "Disk Space"
@@ -99,7 +106,7 @@ fi
 
 # Bot logs
 print_section "Bot Logs (last 20 lines)"
-ssh "$SSH_TARGET" "sudo journalctl -u postureguard-bot --no-pager -n 20 2>/dev/null" || echo -e "${YELLOW}No logs available${NC}"
+ssh "$SSH_TARGET" "${SUDO} journalctl -u postureguard-bot --no-pager -n 20 2>/dev/null" || echo -e "${YELLOW}No logs available${NC}"
 
 # Memory usage
 print_section "Memory Usage"

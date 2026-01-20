@@ -93,6 +93,13 @@ else
     exit 1
 fi
 
+# Sudo prefix (empty if root)
+if [ "$SERVER_USER" = "root" ]; then
+    SUDO=""
+else
+    SUDO="sudo"
+fi
+
 # Step 4: Check server directories
 print_header "Checking Server Directories"
 
@@ -101,7 +108,7 @@ if ssh "$SSH_TARGET" "[ -d '$REMOTE_WEB_PATH' ]" 2>/dev/null; then
     print_success "Web directory exists"
 else
     print_info "Creating web directory..."
-    ssh "$SSH_TARGET" "sudo mkdir -p '$REMOTE_WEB_PATH' && sudo chown ${SERVER_USER}:${SERVER_USER} '$REMOTE_WEB_PATH'"
+    ssh "$SSH_TARGET" "${SUDO} mkdir -p '$REMOTE_WEB_PATH' && ${SUDO} chown ${SERVER_USER}:${SERVER_USER} '$REMOTE_WEB_PATH'"
     print_success "Web directory created"
 fi
 
