@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tg-theme-bg-color: #f8fafc;
+  --tg-theme-text-color: #1e293b;
+  --tg-theme-hint-color: #64748b;
+  --tg-theme-link-color: #16a34a;
+  --tg-theme-button-color: #22c55e;
+  --tg-theme-button-text-color: #ffffff;
+  --tg-theme-secondary-bg-color: #ffffff;
+}
+
+.dark {
+  --tg-theme-bg-color: #0f0f1a;
+  --tg-theme-text-color: #f1f5f9;
+  --tg-theme-hint-color: #94a3b8;
+  --tg-theme-link-color: #4ade80;
+  --tg-theme-button-color: #22c55e;
+  --tg-theme-button-text-color: #ffffff;
+  --tg-theme-secondary-bg-color: #1a1a2e;
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+  
+  body {
+    @apply bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100;
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 active:bg-primary-700 
+           text-white font-semibold py-3 px-6 rounded-xl
+           transition-all duration-200 ease-out
+           shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30
+           active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700
+           text-slate-700 dark:text-slate-200 font-medium py-3 px-6 rounded-xl
+           transition-all duration-200 ease-out
+           active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-ghost {
+    @apply bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800
+           text-slate-600 dark:text-slate-300 font-medium py-2 px-4 rounded-lg
+           transition-all duration-200 ease-out;
+  }
+  
+  .card {
+    @apply bg-surface-light dark:bg-surface-dark rounded-2xl p-4
+           shadow-sm border border-slate-100 dark:border-slate-800;
+  }
+  
+  .card-elevated {
+    @apply bg-surface-light dark:bg-surface-dark rounded-2xl p-4
+           shadow-lg shadow-slate-200/50 dark:shadow-black/20
+           border border-slate-100 dark:border-slate-800;
+  }
+  
+  .input-field {
+    @apply w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+           rounded-xl px-4 py-3 text-slate-800 dark:text-slate-100
+           placeholder:text-slate-400 dark:placeholder:text-slate-500
+           focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500
+           transition-all duration-200;
+  }
+  
+  .posture-indicator {
+    @apply w-4 h-4 rounded-full animate-pulse;
+  }
+  
+  .posture-good {
+    @apply bg-posture-good shadow-lg shadow-posture-good/50;
+  }
+  
+  .posture-attention {
+    @apply bg-posture-attention shadow-lg shadow-posture-attention/50;
+  }
+  
+  .posture-poor {
+    @apply bg-posture-poor shadow-lg shadow-posture-poor/50;
+  }
+  
+  .tab-item {
+    @apply flex flex-col items-center justify-center py-2 px-3 rounded-xl
+           text-slate-500 dark:text-slate-400 transition-all duration-200;
+  }
+  
+  .tab-item.active {
+    @apply text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30;
+  }
+  
+  .progress-ring {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+  
+  .achievement-badge {
+    @apply relative p-4 rounded-2xl bg-gradient-to-br transition-all duration-300;
+  }
+  
+  .achievement-badge.locked {
+    @apply from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 grayscale;
+  }
+  
+  .achievement-badge.unlocked {
+    @apply from-primary-100 to-primary-200 dark:from-primary-900/50 dark:to-primary-800/50;
+  }
+}
+
+@layer utilities {
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-primary-600;
+  }
+}

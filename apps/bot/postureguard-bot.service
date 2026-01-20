@@ -1,0 +1,16 @@
+[Unit]
+Description=PostureGuard Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/home/deploy/postureguard-bot
+Environment=BOT_TOKEN=YOUR_BOT_TOKEN_HERE
+Environment=WEBAPP_URL=https://easy-posture.site
+ExecStart=/home/deploy/postureguard-bot/venv/bin/python bot.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

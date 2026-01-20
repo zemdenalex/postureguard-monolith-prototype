@@ -1,0 +1,35 @@
+# PostureGuard Telegram Bot Service
+# /etc/systemd/system/postureguard-bot.service
+#
+# Installation:
+#   sudo cp postureguard-bot.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now postureguard-bot
+#
+# Commands:
+#   sudo systemctl status postureguard-bot
+#   sudo systemctl restart postureguard-bot
+#   sudo journalctl -u postureguard-bot -f
+
+[Unit]
+Description=PostureGuard Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/home/deploy/postureguard/apps/bot
+Environment="BOT_TOKEN=YOUR_BOT_TOKEN_HERE"
+Environment="WEBAPP_URL=https://easy-posture.site"
+ExecStart=/home/deploy/postureguard/apps/bot/venv/bin/python bot.py
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=postureguard-bot
+
+[Install]
+WantedBy=multi-user.target
